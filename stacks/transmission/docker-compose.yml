@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  transmission:
+    image: lscr.io/linuxserver/transmission:latest
+    entrypoint: ["/bin/sh", "-c", "export PASS=$$(cat /run/secrets/transmission_password); source /init"]
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - USER=transmission
+    volumes:
+      - transmission_config:/config
+      - shared:/downloads
+    ports:
+      - 51413:51413
+      - 51413:51413/udp
+    restart: unless-stopped
+    networks:
+      - nginx
+    secrets:
+      - transmission_password
+
+secrets:
+  transmission_password:
+    external: true
+
+volumes:
+  shared:
+    external: true
+  transmission_config:
+    external: true
+
+networks:
+  nginx:
+    external: true
+

@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  app:
+    image: crazymax/samba
+    ports:
+      - target: 445
+        published: 445
+        protocol: tcp
+        mode: host
+      - target: 3702
+        published: 3702
+        protocol: tcp
+        mode: host
+      - target: 3702
+        published: 3702
+        protocol: udp
+        mode: host
+      - target: 5355
+        published: 5355
+        protocol: tcp
+        mode: host
+      - target: 5355
+        published: 5355
+        protocol: udp
+        mode: host
+    volumes:
+      - samba_data:/data
+      - shared:/samba/shared
+    environment:
+      - "WSDD2_ENABLE=1"
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    restart: unless-stopped
+
+volumes:
+  samba_data:
+    external: true
+  shared:
+    external: true 
