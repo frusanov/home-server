@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  mariadb:
+    image: mariadb:lts
+    restart: unless-stopped
+    environment:
+      - MARIADB_ROOT_PASSWORD_FILE=/run/secrets/mariadb_password
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    networks:
+      - databases
+    secrets:
+      - mariadb_password
+
+  adminer:
+    image: adminer:latest
+    restart: unless-stopped
+    networks:
+      - nginx
+      - databases
+
+secrets:
+  mariadb_password:
+    external: true
+
+volumes:
+  mariadb_data:
+    external: true
+
+networks:
+  databases:
+    external: true
+  nginx:
+    external: true
+

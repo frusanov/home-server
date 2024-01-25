@@ -46,9 +46,10 @@ sudo docker swarm init
 https://docs.portainer.io/start/install-ce/server/swarm/linux
 
 ---
-## Create `nginx` network
+## Create networks
 ```sh
 docker network create --scope=swarm --attachable -d overlay nginx
+docker network create --scope=swarm --attachable -d overlay databases
 ```
 Then connect portainer_portainer service to nginx network via Portainer UI
 
@@ -60,6 +61,7 @@ docker volume create nginx_data
 docker volume create nginx_letsencrypt
 docker volume create transmission_config
 docker volume create samba_data
+docker volume create mariadb_data
 ```
 ---
 
@@ -70,6 +72,7 @@ export $(egrep  -v '^#'  /run/secrets/* | xargs)
 ```
 
 `transmission_password`  
+`mariadb_password`  
 
 
 ---
