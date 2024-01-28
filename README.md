@@ -62,17 +62,16 @@ docker volume create nginx_letsencrypt
 docker volume create transmission_config
 docker volume create samba_data
 docker volume create mariadb_data
+docker volume create postgres_data
+docker volume create redis_data
 ```
 ---
 
 ## Create secrets  
-```sh
-# export_all.sh
-export $(egrep  -v '^#'  /run/secrets/* | xargs) 
-```
 
 `transmission_password`  
 `mariadb_password`  
+`postgres_password`  
 
 
 ---

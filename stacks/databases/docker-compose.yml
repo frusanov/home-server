@@ -13,6 +13,41 @@ services:
     secrets:
       - mariadb_password
 
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d postgres -U postgres"]
+      start_period: 20s
+      interval: 30s
+      retries: 5
+      timeout: 5s
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
+    networks:
+      - databases
+    secrets:
+      - postgres_password
+
+  redis:
+    image: redis:alpine
+    command: --save 60 1 --loglevel warning
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      start_period: 20s
+      interval: 30s
+      retries: 5
+      timeout: 3s
+    volumes:
+      - redis_data:/data
+    networks:
+      - databases
+
   adminer:
     image: adminer:latest
     restart: unless-stopped
@@ -23,9 +58,15 @@ services:
 secrets:
   mariadb_password:
     external: true
+  postgres_password:
+    external: true
 
 volumes:
   mariadb_data:
+    external: true
+  postgres_data:
+    external: true
+  redis_data:
     external: true
 
 networks:
