@@ -64,6 +64,7 @@ docker volume create samba_data
 docker volume create mariadb_data
 docker volume create postgres_data
 docker volume create redis_data
+docker volume create firefly_upload
 ```
 ---
 
@@ -72,6 +73,8 @@ docker volume create redis_data
 `transmission_password`  
 `mariadb_password`  
 `postgres_password`  
+`firefly_app_key` - 32 characters, no special symbols
+`firefly_cron_token` - 32 characters, no special symbols
 
 
 ---

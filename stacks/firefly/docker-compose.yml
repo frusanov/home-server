@@ -1,0 +1,77 @@
+version: '3.3'
+
+#
+# The Firefly III Data Importer will ask you for the Firefly III URL and a "Client ID".
+# You can generate the Client ID at http://localhost/profile (after registering)
+# The Firefly III URL is: http://app:8080
+#
+# Other URL's will give 500 | Server Error
+#
+
+services:
+  app:
+    image: fireflyiii/core:latest
+    hostname: app
+    networks:
+      - databases
+      - nginx
+    restart: unless-stopped
+    volumes:
+      - firefly_upload:/var/www/html/storage/upload
+    secrets:
+      - postgres_password
+      - firefly_app_key
+      - firefly_cron_token
+    environment:
+      # https://raw.githubusercontent.com/firefly-iii/firefly-iii/main/.env.example
+      TRUSTED_PROXIES: '*'
+      APP_KEY_FILE: /run/secrets/firefly_app_key
+      STATIC_CRON_TOKEN_FILE: /run/secrets/firefly_cron_token
+      DB_CONNECTION: pgsql
+      DB_HOST: databases_postgres
+      DB_PORT: 5432
+      DB_DATABASE: firefly
+      DB_USERNAME: postgres
+      DB_PASSWORD_FILE: /run/secrets/postgres_password
+      # REDIS_HOST: databases_redis
+
+  # importer:
+  #   image: fireflyiii/data-importer:latest
+  #   hostname: importer
+  #   restart: always
+  #   networks:
+  #     - firefly_iii
+  #   depends_on:
+  #     - app
+  #   env_file: .importer.env
+
+  cron:
+    #
+    # To make this work, set STATIC_CRON_TOKEN in your .env file or as an environment variable and replace REPLACEME below
+    # The STATIC_CRON_TOKEN must be *exactly* 32 characters long
+    #
+    image: alpine
+    restart: unless-stopped
+    command: sh -c "echo \"0 3 * * * wget -qO- http://firefly_app:8080/api/v1/cron/$$(cat /run/secrets/firefly_cron_token)\" | crontab - && crond -f -L /dev/stdout"
+    networks:
+      - nginx
+    secrets:
+      - firefly_cron_token
+
+secrets:
+  firefly_app_key:
+    external: true
+  postgres_password:
+    external: true
+  firefly_cron_token:
+    external: true
+
+volumes:
+  firefly_upload:
+    external: true
+
+networks:
+  databases:
+    external: true
+  nginx:
+    external: true
