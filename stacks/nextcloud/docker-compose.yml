@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  app:
+    image: lscr.io/linuxserver/nextcloud:28.0.2
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - nextcloud_config:/config
+      - nextcloud_data:/data
+    networks:
+      - nginx
+      - databases
+    restart: unless-stopped
+
+volumes:
+  nextcloud_config:
+    external: true
+  nextcloud_data:
+    external: true
+
+networks:
+  nginx:
+    external: true
+  databases:
+    external: true
+

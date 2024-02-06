@@ -65,6 +65,8 @@ docker volume create mariadb_data
 docker volume create postgres_data
 docker volume create redis_data
 docker volume create firefly_upload
+docker volume create nextcloud_config
+docker volume create nextcloud_data
 ```
 ---
 
