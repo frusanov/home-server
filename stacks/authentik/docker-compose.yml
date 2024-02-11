@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  server:
+    image: ghcr.io/goauthentik/server:2023.10.7
+    restart: unless-stopped
+    command: server
+    environment:
+      AUTHENTIK_SECRET_KEY: file:///run/secrets/authentik_secret_key
+      AUTHENTIK_REDIS__HOST: databases_redis
+      AUTHENTIK_POSTGRESQL__HOST: databases_postgres
+      AUTHENTIK_POSTGRESQL__USER: postgres
+      AUTHENTIK_POSTGRESQL__NAME: authentik
+      AUTHENTIK_POSTGRESQL__PASSWORD: file:///run/secrets/postgres_password
+    volumes:
+      - authentik_media:/media
+      - authentik_templates:/templates
+    networks:
+      - databases
+      - nginx
+    secrets:
+      - authentik_secret_key
+      - postgres_password
+  worker:
+    image: ghcr.io/goauthentik/server:2023.10.7
+    restart: unless-stopped
+    command: worker
+    environment:
+      AUTHENTIK_SECRET_KEY: file:///run/secrets/authentik_secret_key
+      AUTHENTIK_REDIS__HOST: databases_redis
+      AUTHENTIK_POSTGRESQL__HOST: databases_postgres
+      AUTHENTIK_POSTGRESQL__USER: postgres
+      AUTHENTIK_POSTGRESQL__NAME: authentik
+      AUTHENTIK_POSTGRESQL__PASSWORD: file:///run/secrets/postgres_password
+    # `user: root` and the docker socket volume are optional.
+    # See more for the docker socket integration here:
+    # https://goauthentik.io/docs/outposts/integrations/docker
+    # Removing `user: root` also prevents the worker from fixing the permissions
+    # on the mounted folders, so when removing this make sure the folders have the correct UID/GID
+    # (1000:1000 by default)
+    user: root
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - authentik_media:/media
+      - authentik_certs:/certs
+      - authentik_templates:/templates
+    networks:
+      - databases
+    secrets:
+      - authentik_secret_key
+      - postgres_password
+
+secrets:
+  authentik_secret_key:
+    external: true
+  postgres_password:
+    external: true
+
+volumes:
+  authentik_media:
+    external: true
+  authentik_certs:
+    external: true
+  authentik_templates:
+    external: true
+
+networks:
+  databases:
+    external: true
+  nginx:
+    external: true
+

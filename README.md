@@ -67,6 +67,9 @@ docker volume create redis_data
 docker volume create firefly_upload
 docker volume create nextcloud_config
 docker volume create nextcloud_data
+docker volume create authentik_media
+docker volume create authentik_certs
+docker volume create authentik_templates
 ```
 ---
 
@@ -77,6 +80,7 @@ docker volume create nextcloud_data
 `postgres_password`  
 `firefly_app_key` - 32 characters, no special symbols
 `firefly_cron_token` - 32 characters, no special symbols
+`authentik_secret_key` - pwgen -s 50 1
 
 
 ---
