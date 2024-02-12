@@ -70,6 +70,7 @@ docker volume create nextcloud_data
 docker volume create authentik_media
 docker volume create authentik_certs
 docker volume create authentik_templates
+docker volume create jellyfin_config
 ```
 ---
 

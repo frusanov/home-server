@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  app:
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - jellyfin_config:/config
+      - shared:/data/shared
+    restart: unless-stopped
+    networks:
+      - nginx
+
+volumes:
+  shared:
+    external: true
+  jellyfin_config:
+    external: true 
+
+networks:
+  nginx:
+    external: true
+
