@@ -14,11 +14,11 @@ services:
       - nginx
       - databases
     restart: unless-stopped
-  collabora:
-    image: collabora/code:latest
-    restart: unless-stopped
-    networks:
-      - nginx
+  # collabora:
+  #   image: collabora/code:latest
+  #   restart: unless-stopped
+  #   networks:
+  #     - nginx
 
 volumes:
   nextcloud_config:
