@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - prowlarr_config:/config
+    networks:
+      - nginx
+    restart: unless-stopped
+  
+  lidarr:
+    image: lscr.io/linuxserver/lidarr:latest
+    container_name: lidarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - lidarr_config:/config
+      - shared:/shared
+      - shared:/downloads
+    networks:
+      - nginx
+    restart: unless-stopped
+
+  readarr:
+    image: lscr.io/linuxserver/readarr:develop
+    container_name: readarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - readarr_config:/config
+      - shared:/shared
+      - shared:/downloads
+    networks:
+      - nginx
+    restart: unless-stopped
+
+volumes:
+  shared:
+    external: true
+  prowlarr_config:
+    external: true 
+  lidarr_config:
+    external: true 
+  readarr_config:
+    external: true 
+
+networks:
+  nginx:
+    external: true
+
