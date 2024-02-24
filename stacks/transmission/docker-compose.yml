@@ -3,6 +3,11 @@ version: '3.8'
 services:
   transmission:
     image: lscr.io/linuxserver/transmission:latest
+    restart: unless-stopped:3
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
     entrypoint: ["/bin/sh", "-c", "export PASS=$$(cat /run/secrets/transmission_password); source /init"]
     environment:
       - PUID=1000
@@ -15,7 +20,6 @@ services:
     ports:
       - 51413:51413
       - 51413:51413/udp
-    restart: unless-stopped
     networks:
       - nginx
     secrets:

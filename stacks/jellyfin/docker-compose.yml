@@ -3,7 +3,11 @@ version: '3.8'
 services:
   app:
     image: lscr.io/linuxserver/jellyfin:latest
-    container_name: jellyfin
+    restart: unless-stopped:3
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
     environment:
       - PUID=1000
       - PGID=1000
@@ -12,7 +16,6 @@ services:
     volumes:
       - jellyfin_config:/config
       - shared:/data/shared
-    restart: unless-stopped
     devices:
       - /dev/dri:/dev/dri
       - /dev/kfd:/dev/kfd

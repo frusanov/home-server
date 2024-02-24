@@ -3,7 +3,11 @@ version: '3.8'
 services:
   app:
     image: 'jc21/nginx-proxy-manager:latest'
-    restart: unless-stopped
+    restart: unless-stopped:3
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
     ports:
       - '80:80'
       - '81:81'

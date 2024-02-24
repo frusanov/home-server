@@ -3,7 +3,11 @@ version: '3.8'
 services:
   server:
     image: ghcr.io/goauthentik/server:2023.10.7
-    restart: unless-stopped
+    restart: unless-stopped:3
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
     command: server
     environment:
       AUTHENTIK_SECRET_KEY: file:///run/secrets/authentik_secret_key
@@ -23,7 +27,11 @@ services:
       - postgres_password
   worker:
     image: ghcr.io/goauthentik/server:2023.10.7
-    restart: unless-stopped
+    restart: unless-stopped:3
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
     command: worker
     environment:
       AUTHENTIK_SECRET_KEY: file:///run/secrets/authentik_secret_key

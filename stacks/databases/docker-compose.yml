@@ -3,7 +3,11 @@ version: '3.8'
 services:
   mariadb:
     image: mariadb:lts
-    restart: unless-stopped
+    restart: unless-stopped:3
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
     environment:
       - MARIADB_ROOT_PASSWORD_FILE=/run/secrets/mariadb_password
     volumes:
@@ -15,7 +19,11 @@ services:
 
   postgres:
     image: postgres:16-alpine
-    restart: unless-stopped
+    restart: unless-stopped:3
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -d postgres -U postgres"]
       start_period: 20s
@@ -35,8 +43,12 @@ services:
 
   redis:
     image: redis:alpine
+    restart: unless-stopped:3
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
     command: --save 60 1 --loglevel warning
-    restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
       start_period: 20s

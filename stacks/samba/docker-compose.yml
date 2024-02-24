@@ -3,6 +3,11 @@ version: '3.8'
 services:
   app:
     image: crazymax/samba
+    restart: unless-stopped:3
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
     ports:
       - target: 445
         published: 445
@@ -32,7 +37,6 @@ services:
     cap_add:
       - NET_ADMIN
       - NET_RAW
-    restart: unless-stopped
 
 volumes:
   samba_data:

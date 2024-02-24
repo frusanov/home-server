@@ -3,7 +3,11 @@ version: '3.8'
 services:
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest
-    container_name: prowlarr
+    restart: unless-stopped:3
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
     environment:
       - PUID=1000
       - PGID=1000
@@ -12,11 +16,14 @@ services:
       - prowlarr_config:/config
     networks:
       - nginx
-    restart: unless-stopped
   
   lidarr:
     image: lscr.io/linuxserver/lidarr:latest
-    container_name: lidarr
+    restart: unless-stopped:3
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
     environment:
       - PUID=1000
       - PGID=1000
@@ -27,11 +34,14 @@ services:
       - shared:/downloads
     networks:
       - nginx
-    restart: unless-stopped
 
   readarr:
-    image: lscr.io/linuxserver/readarr:develop
-    container_name: readarr
+    image: lscr.io/linuxserver/readarr:latest
+    restart: unless-stopped:3
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
     environment:
       - PUID=1000
       - PGID=1000
@@ -42,7 +52,6 @@ services:
       - shared:/downloads
     networks:
       - nginx
-    restart: unless-stopped
 
 volumes:
   shared:
