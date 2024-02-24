@@ -8,10 +8,14 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Etc/UTC
+      - DOCKER_MODS=linuxserver/mods:jellyfin-amd
     volumes:
       - jellyfin_config:/config
       - shared:/data/shared
     restart: unless-stopped
+    devices:
+      - /dev/dri:/dev/dri
+      - /dev/kfd:/dev/kfd
     networks:
       - nginx
 
