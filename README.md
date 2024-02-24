@@ -1,3 +1,48 @@
+# Home Server
+
+Current setup is based on x86_64 laptop with Alpine Linux and Raspberry Pi 3B+ with Raspberry Pi OS
+
+```mermaid
+flowchart TD
+    subgraph main_server ["
+      server.home
+    "]
+
+      NFS
+
+      SwarmManager["
+        Docker Swarm
+        manager
+      "]
+
+
+    end
+
+    SwarmManager <--> SwarmWorker
+    SwarmManager <--> NFS
+    SwarmWorker <--> NFS
+
+
+    subgraph rpi["
+      rpi.home
+    "]
+    
+
+      SwarmWorker["
+        Docker Swarm
+        worker
+      "]
+
+    end
+
+    router
+
+    main_server <--> router
+    rpi <--> router
+```
+
+## Alpine Linux
+
 Alpine linux must be installed in SYS mode  
 In that example we assuming that system has user account other than root
 
@@ -23,6 +68,28 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/too
 sudo nano /etc/passwd
 ```
 Change /bin/ash to /bin/zsh for your user
+
+## Install NFS
+```sh
+sudo apk add nfs-utils
+sudo rc-update add nfs
+sudo service nfs start
+```
+
+## NFS shares
+```sh
+sudo ln -s <path_to_shared> /mnt/shared
+
+sudo nano /etc/exports
+```
+Add line
+```
+/mnt/shared 192.168.1.0/24(rw,no_subtree_check)
+```
+```sh
+sudo exportfs -a
+```
+
 
 ---
 ## Install docker
