@@ -15,7 +15,7 @@ services:
       - DOCKER_MODS=linuxserver/mods:jellyfin-amd
     volumes:
       - jellyfin_config:/config
-      - nfs_shared:/data/shared
+      - shared:/data/shared
     devices:
       - /dev/dri:/dev/dri
       - /dev/kfd:/dev/kfd
@@ -23,14 +23,10 @@ services:
       - nginx
 
 volumes:
+  shared:
+    external: true
   jellyfin_config:
     external: true 
-  nfs_shared:
-    driver: local
-    driver_opts:
-      type: nfs
-      device: ":/mnt/shared"
-      o: addr=server.home,rw
 
 networks:
   nginx:
