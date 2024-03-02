@@ -54,7 +54,7 @@ su
 As root:
 ```sh
 sed -i 's/#\(.*\/community\)/\1/' /etc/apk/repositories
-apk add sudo curl zsh git tmux nano htop
+apk add sudo curl zsh git tmux nano htop nodejs
 
 echo '%wheel ALL=(ALL) ALL' > /etc/sudoers.d/wheel
 adduser %username% wheel
