@@ -1,0 +1,25 @@
+#!/bin/bash
+
+docker run --rm -it \
+  \
+  -v backup_config:/config/ \
+  -v /tmp:/tmp \
+  \
+  -v nginx_data:/volumes/nginx_data/ \
+  -v nginx_config:/volumes/nginx_config/ \
+  -v nginx_letsencrypt:/volumes/nginx_letsencrypt/ \
+  -v transmission_config:/volumes/transmission_config/ \
+  -v samba_data:/volumes/samba_data/ \
+  -v mariadb_data:/volumes/mariadb_data/ \
+  -v postgres_data:/volumes/postgres_data/ \
+  -v firefly_upload:/volumes/firefly_upload/ \
+  -v nextcloud_config:/volumes/nextcloud_config/ \
+  -v authentik_media:/volumes/authentik_media/ \
+  -v authentik_certs:/volumes/authentik_certs/ \
+  -v authentik_templates:/volumes/authentik_templates/ \
+  -v jellyfin_config:/volumes/jellyfin_config/ \
+  -v lidarr_config:/volumes/lidarr_config/ \
+  -v radarr_config:/volumes/radarr_config/ \
+  -v prowlarr_config:/volumes/prowlarr_config/ \
+  \
+  --name backup backup:local $@

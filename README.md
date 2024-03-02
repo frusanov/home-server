@@ -123,6 +123,7 @@ Then connect portainer_portainer service to nginx network via Portainer UI
 ---
 ## Create volumes
 ```sh
+docker volume create backup_config
 docker volume create shared
 docker volume create nginx_data
 docker volume create nginx_letsencrypt
@@ -140,6 +141,7 @@ docker volume create authentik_templates
 docker volume create jellyfin_config
 docker volume create lidarr_config
 docker volume create readarr_config
+docker volume create prowlarr_config
 ```
 ---
 
