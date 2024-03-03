@@ -8,8 +8,11 @@ RUN wget -qO - https://raw.githubusercontent.com/cupcakearmy/autorestic/master/i
 COPY ./.autorestic.yml /root/.autorestic.yml
 COPY ./exec-swarm /usr/local/bin/exec-swarm
 COPY ./entrypoint.sh /entrypoint.sh
+COPY ./env.sh /env.sh
 
 RUN chmod +x /usr/local/bin/exec-swarm
 RUN chmod +x /entrypoint.sh
+RUN chmod +x /env.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
+CMD ["bash", "-c" "source /env.sh; $@"]

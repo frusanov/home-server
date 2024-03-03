@@ -34,7 +34,8 @@ services:
       - authentik_templates:/mnt/volumes/authentik_templates
       - jellyfin_config:/mnt/volumes/jellyfin_config
       - jellyfin_data:/mnt/volumes/jellyfin_data
-      - radarr_config:/mnt/volumes/radarr_config
+      - lidarr_config:/mnt/volumes/lidarr_config
+      - readarr_config:/mnt/volumes/readarr_config
       - prowlarr_config:/mnt/volumes/prowlarr_config
     secrets:
       - backup_password
@@ -77,7 +78,9 @@ volumes:
     external: true
   jellyfin_data:
     external: true
-  radarr_config:
+  lidarr_config:
+    external: true
+  readarr_config:
     external: true
   prowlarr_config:
     external: true
