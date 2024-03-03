@@ -124,6 +124,7 @@ Then connect portainer_portainer service to nginx network via Portainer UI
 ## Create volumes
 ```sh
 docker volume create backup_config
+docker volume create backup_data
 docker volume create shared
 docker volume create nginx_data
 docker volume create nginx_letsencrypt
@@ -150,9 +151,10 @@ docker volume create prowlarr_config
 `transmission_password`  
 `mariadb_password`  
 `postgres_password`  
-`firefly_app_key` - 32 characters, no special symbols
-`firefly_cron_token` - 32 characters, no special symbols
-`authentik_secret_key` - pwgen -s 50 1
+`backup_password`  
+`firefly_app_key` - 32 characters, no special symbols  
+`firefly_cron_token` - 32 characters, no special symbols  
+`authentik_secret_key` - pwgen -s 50 1  
 
 
 ---

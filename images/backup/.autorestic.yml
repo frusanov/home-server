@@ -1,0 +1,167 @@
+version: 2
+ 
+locations:
+  postgres:
+    cron: '0 2/12 * * *'
+    from: /tmp/postgres
+    to: local
+    copy:
+      local:
+        - gdrive
+    hooks:
+      before:
+        - >-
+          (mkdir /tmp/postgres &> /dev/null || true) &&
+          exec-swarm databases_postgres pg_dumpall -c -U postgres > /tmp/postgres/backup.sql
+      after:
+        - rm -rf /tmp/postgres
+    forget: prune
+    options:
+      forget:
+        keep-last: 5
+        keep-daily: 7
+        keep-weekly: 4
+        keep-monthly: 12
+        keep-yearly: 3
+
+  mariadb:
+    cron: '0 1/12 * * *'
+    from: /tmp/mariadb
+    to: local
+    copy:
+      local:
+        - gdrive
+    hooks:
+      before:
+        - >-
+          (mkdir /tmp/mariadb &> /dev/null || true) &&
+          exec-swarm databases_mariadb mysqldump -u root -p$(echo $MARIADB_ROOT_PASSWORD) --all-databases > /tmp/mariadb/backup.sql
+      after:
+        - rm -rf /tmp/mariadb
+    forget: prune
+    options:
+      forget:
+        keep-last: 5
+        keep-daily: 7
+        keep-weekly: 4
+        keep-monthly: 12
+        keep-yearly: 3
+        
+  nginx:
+    cron: '0 3/12 * * *'
+    from:
+      - /mnt/volumes/nginx_data
+      - /mnt/volumes/nginx_letsencrypt
+    to: local
+    copy:
+      local:
+        - gdrive
+    forget: prune
+    options:
+      forget:
+        keep-last: 5
+        keep-daily: 7
+        keep-weekly: 4
+        keep-monthly: 12
+        keep-yearly: 3
+
+  nextcloud-config:
+    cron: '0 4/12 * * *'
+    from: /mnt/volumes/nextcloud_config
+    to: local
+    copy:
+      local:
+        - gdrive
+    forget: prune
+    options:
+      forget:
+        keep-last: 5
+        keep-daily: 7
+        keep-weekly: 4
+        keep-monthly: 12
+        keep-yearly: 3
+
+  nextcloud-data:
+    cron: '0 6 * * *'
+    from: /mnt/volumes/nextcloud_data
+    to: gdrive
+    forget: prune
+    options:
+      forget:
+        keep-daily: 7
+        keep-weekly: 4
+        keep-monthly: 12
+        keep-yearly: 3
+
+  authentik:
+    cron: '0 5/12 * * *'
+    from:
+      - /mnt/volumes/authentik_media
+      - /mnt/volumes/authentik_certs
+      - /mnt/volumes/authentik_templates
+    to: local
+    copy:
+      local:
+        - gdrive
+    forget: prune
+    options:
+      forget:
+        keep-last: 5
+        keep-daily: 7
+        keep-weekly: 4
+        keep-monthly: 12
+        keep-yearly: 3
+
+  jellyfin:
+    cron: '30 1/12 * * *'
+    from: /mnt/volumes/jellyfin_config
+    to: local
+    copy:
+      local:
+        - gdrive
+    forget: prune
+    options:
+      forget:
+        keep-last: 5
+        keep-daily: 7
+        keep-weekly: 4
+        keep-monthly: 12
+        keep-yearly: 3
+
+  servarr:
+    cron: '30 2/12 * * *'
+    from:
+      - /mnt/volumes/prowlarr_config
+      - /mnt/volumes/lidarr_config
+      - /mnt/volumes/radarr_config
+    to: local
+    copy:
+      local:
+        - gdrive
+    forget: prune
+    options:
+      forget:
+        keep-last: 5
+        keep-daily: 7
+        keep-weekly: 4
+        keep-monthly: 12
+        keep-yearly: 3
+
+  music:
+    cron: '0 18 */3 * *'
+    from: /mnt/volumes/shared/music
+    to: gdrive
+    forget: prune
+    options:
+      forget:
+        keep-last: 3
+ 
+backends:
+  local:
+    type: local
+    path: /mnt/backup
+    key: 'if not key is set it will be generated for you'
+  
+  gdrive:
+    type: rclone
+    path: 'gdrive:backup/home-server'

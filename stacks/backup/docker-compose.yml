@@ -1,0 +1,85 @@
+version: '3.8'
+
+services:
+  app:
+    image: 'backup:local'
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      placement:
+        constraints:
+          - node.role == manager
+    environment:
+      TZ: 'Europe/Istanbul'
+      AUTORESTIC_LOCAL_RESTIC_PASSWORD_FILE: /run/secrets/backup_password
+      AUTORESTIC_GDRIVE_RESTIC_PASSWORD_FILE: /run/secrets/backup_password
+      MARIADB_ROOT_PASSWORD_FILE: /run/secrets/mariadb_password
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - backup_config:/config
+      - shared:/mnt/volumes/shared
+      - backup_data:/mnt/volumes/backup_data
+      - nginx_data:/mnt/volumes/nginx_data
+      - nginx_config:/mnt/volumes/nginx_config
+      - nginx_letsencrypt:/mnt/volumes/nginx_letsencrypt
+      - transmission_config:/mnt/volumes/transmission_config
+      - samba_data:/mnt/volumes/samba_data
+      - firefly_upload:/mnt/volumes/firefly_upload
+      - nextcloud_config:/mnt/volumes/nextcloud_config
+      - authentik_media:/mnt/volumes/authentik_media
+      - authentik_certs:/mnt/volumes/authentik_certs
+      - authentik_templates:/mnt/volumes/authentik_templates
+      - jellyfin_config:/mnt/volumes/jellyfin_config
+      - jellyfin_data:/mnt/volumes/jellyfin_data
+      - radarr_config:/mnt/volumes/radarr_config
+      - prowlarr_config:/mnt/volumes/prowlarr_config
+    secrets:
+      - backup_password
+      - mariadb_password
+
+secrets:
+  backup_password:
+    external: true
+  mariadb_password:
+    external: true
+
+volumes:
+  shared:
+    external: true
+  backup_config:
+    external: true
+  backup_data:
+    external: true 
+  nginx_data:
+    external: true
+  nginx_config:
+    external: true
+  nginx_letsencrypt:
+    external: true
+  transmission_config:
+    external: true
+  samba_data:
+    external: true
+  firefly_upload:
+    external: true
+  nextcloud_config:
+    external: true
+  authentik_media:
+    external: true
+  authentik_certs:
+    external: true
+  authentik_templates:
+    external: true
+  jellyfin_config:
+    external: true
+  jellyfin_data:
+    external: true
+  radarr_config:
+    external: true
+  prowlarr_config:
+    external: true
+
+

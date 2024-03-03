@@ -1,0 +1,9 @@
+#!/bin/bash
+
+service_name=$1;
+service_hash_command="docker service ps -f name=$service_name.1  $service_name -q --no-trunc";
+service_hash=$($service_hash_command | head -n1);
+
+shift;
+
+docker exec -it $service_name.1.$service_hash $@
