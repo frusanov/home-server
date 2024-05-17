@@ -143,6 +143,7 @@ docker volume create jellyfin_config
 docker volume create lidarr_config
 docker volume create readarr_config
 docker volume create prowlarr_config
+docker volume create open-webui_data
 ```
 ---
 
@@ -155,6 +156,8 @@ docker volume create prowlarr_config
 `firefly_app_key` - 32 characters, no special symbols  
 `firefly_cron_token` - 32 characters, no special symbols  
 `authentik_secret_key` - pwgen -s 50 1  
+`open-webui-database` - postgresql://postgres:password@postgres:5432/openwebui  
+`open-webui-secret-key`
 
 
 ---

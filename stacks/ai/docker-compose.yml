@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  openwebui:
+    image: ghcr.io/open-webui/open-webui:main
+    restart: unless-stopped
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+    environment:
+      - DATABASE_URL=file:///run/secrets/open-webui-database
+      - WEBUI_SECRET_KEY=file:///run/secrets/open-webui-secret-key
+    volumes:
+      - open-webui_data:/app/backend/data
+    networks:
+      - nginx
+      - databases
+    secrets:
+      - open-webui-database
+      - open-webui-secret-key
+
+volumes:
+  open-webui_data:
+    external: true
+
+networks:
+  nginx:
+    external: true
+  databases:
+    external: true
+
+secrets:
+  open-webui-database:
+    external: true
+  open-webui-secret-key:
+    external: true
+
