@@ -1,9 +1,5 @@
 version: '3.8'
 
-env_file:
-  path: stack.env
-  required: true
-
 services:
   app:
     image: owncloud/ocis:5
@@ -20,16 +16,16 @@ services:
       OCIS_LDAP_BIND_DN: ${OCIS_LDAP_BIND_DN}
       OCIS_LDAP_BIND_PASSWORD: ${OCIS_LDAP_BIND_PASSWORD}
       OCIS_LDAP_GROUP_BASE_DN: ${OCIS_LDAP_GROUP_BASE_DN}
-      OCIS_LDAP_GROUP_FILTER: "(objectclass=owncloud)"
+      OCIS_LDAP_GROUP_FILTER: ${OCIS_LDAP_GROUP_FILTER}
       OCIS_LDAP_GROUP_OBJECTCLASS: "groupOfNames"
       OCIS_LDAP_USER_BASE_DN: ${OCIS_LDAP_USER_BASE_DN}
-      OCIS_LDAP_USER_FILTER: ${OCIS_LDAP_USER_BASE_DN}
+      OCIS_LDAP_USER_FILTER: ${OCIS_LDAP_USER_FILTER}
       OCIS_LDAP_USER_OBJECTCLASS: "inetOrgPerson"
-      LDAP_LOGIN_ATTRIBUTES: "uid"
+      LDAP_LOGIN_ATTRIBUTES: ${LDAP_LOGIN_ATTRIBUTES}
       OCIS_ADMIN_USER_ID: ${OCIS_ADMIN_USER_ID}
-      IDP_LDAP_LOGIN_ATTRIBUTE: "uid"
-      IDP_LDAP_UUID_ATTRIBUTE: ${IDP_LDAP_UUID_ATTRIBUTE}
-      IDP_LDAP_UUID_ATTRIBUTE_TYPE: binary
+      IDP_LDAP_LOGIN_ATTRIBUTE: ${IDP_LDAP_LOGIN_ATTRIBUTE}
+      IDP_LDAP_UUID_ATTRIBUTE: "uid"
+      IDP_LDAP_UUID_ATTRIBUTE_TYPE: text
       GRAPH_LDAP_SERVER_WRITE_ENABLED: "true" # assuming the external ldap is writable
       GRAPH_LDAP_REFINT_ENABLED: "true" # osixia has refint enabled.
       # OCIS_RUN_SERVICES specifies to start all services except glauth, idm and accounts. These are replaced by external services
