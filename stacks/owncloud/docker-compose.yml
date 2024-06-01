@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  app:
+    image: owncloud/ocis:5
+    restart: unless-stopped:3
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+    environment:
+      - OCIS_INSECURE=true
+    volumes:
+      - owncloud_config:/etc/ocis
+      - owncloud_data:/var/lib/ocis
+    networks:
+      - nginx
+      - databases
+
+volumes:
+  owncloud_config:
+    external: true
+  owncloud_data:
+    external: true
+
+networks:
+  nginx:
+    external: true
+  databases:
+    external: true
+

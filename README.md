@@ -144,6 +144,8 @@ docker volume create lidarr_config
 docker volume create readarr_config
 docker volume create prowlarr_config
 docker volume create open-webui_data
+docker volume create owncloud_config
+docker volume create owncloud_data
 ```
 ---
 
