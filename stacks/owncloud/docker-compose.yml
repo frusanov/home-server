@@ -1,5 +1,9 @@
 version: '3.8'
 
+env_file:
+  path: stack.env
+  required: true
+
 services:
   app:
     image: owncloud/ocis:5
@@ -9,7 +13,32 @@ services:
         constraints:
           - node.role == manager
     environment:
-      - OCIS_INSECURE=true
+      OCIS_INSECURE: "true"
+      PROXY_HTTP_ADDR: 0.0.0.0:9200
+      OCIS_LDAP_URI: ${OCIS_LDAP_URI}
+      OCIS_LDAP_INSECURE: "true"
+      OCIS_LDAP_BIND_DN: ${OCIS_LDAP_BIND_DN}
+      OCIS_LDAP_BIND_PASSWORD: ${OCIS_LDAP_BIND_PASSWORD}
+      OCIS_LDAP_GROUP_BASE_DN: ${OCIS_LDAP_GROUP_BASE_DN}
+      OCIS_LDAP_GROUP_FILTER: "(objectclass=owncloud)"
+      OCIS_LDAP_GROUP_OBJECTCLASS: "groupOfNames"
+      OCIS_LDAP_USER_BASE_DN: ${OCIS_LDAP_USER_BASE_DN}
+      OCIS_LDAP_USER_FILTER: ${OCIS_LDAP_USER_BASE_DN}
+      OCIS_LDAP_USER_OBJECTCLASS: "inetOrgPerson"
+      LDAP_LOGIN_ATTRIBUTES: "uid"
+      OCIS_ADMIN_USER_ID: ${OCIS_ADMIN_USER_ID}
+      IDP_LDAP_LOGIN_ATTRIBUTE: "uid"
+      IDP_LDAP_UUID_ATTRIBUTE: ${IDP_LDAP_UUID_ATTRIBUTE}
+      IDP_LDAP_UUID_ATTRIBUTE_TYPE: binary
+      GRAPH_LDAP_SERVER_WRITE_ENABLED: "true" # assuming the external ldap is writable
+      GRAPH_LDAP_REFINT_ENABLED: "true" # osixia has refint enabled.
+      # OCIS_RUN_SERVICES specifies to start all services except glauth, idm and accounts. These are replaced by external services
+      OCIS_EXCLUDE_RUN_SERVICES: idm
+      # General oCIS config
+      OCIS_URL: ${OCIS_URL}
+      OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-info}
+      OCIS_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
+      PROXY_TLS: "false" # do not use SSL between Traefik and oCIS
     volumes:
       - owncloud_config:/etc/ocis
       - owncloud_data:/var/lib/ocis
