@@ -4,10 +4,18 @@ services:
   openwebui:
     image: ghcr.io/open-webui/open-webui:main
     restart: unless-stopped
+    env_file:
+      - ../stack.env
     deploy:
       placement:
         constraints:
           - node.role == manager
+    environment:
+      - ENABLE_SIGNUP=false
+      - ENABLE_OAUTH_SIGNUP=true
+      - OAUTH_CLIENT_ID=${OAUTH_CLIENT_ID}
+      - OAUTH_CLIENT_SECRET=${OAUTH_CLIENT_SECRET}
+      - OPENID_PROVIDER_URL=${OPENID_PROVIDER_URL}
     volumes:
       - open-webui_data:/app/backend/data
     networks:

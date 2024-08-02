@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# Get the name of the script
+script_name=$(basename "$0")
+
+# Destination directory, passed as the first argument
+destination_dir="/var/lib/docker/volumes/scripts/_data"
+
+# Check if the destination directory is provided
+if [ -z "$destination_dir" ]; then
+  echo "Usage: $script_name <destination_directory>"
+  exit 1
+fi
+
+# Check if the destination directory exists
+if [ ! -d "$destination_dir" ]; then
+  echo "Error: Destination directory '$destination_dir' does not exist."
+  exit 1
+fi
+
+# Loop through all files in the current directory
+for file in *; do
+  # Check if the file is not the script itself and is not a directory
+  if [[ "$file" != "$script_name" && ! -d "$file" ]]; then
+    # Copy the file to the destination directory
+    cp "$file" "$destination_dir/"
+  fi
+done
+
+echo "Files copied to $destination_dir, excluding $script_name."

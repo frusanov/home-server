@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# Loop through all environment variables
+for var in $(compgen -e); do
+  # Check if the variable ends with _FILE
+  if [[ $var == *_FILE ]]; then
+    # Get the base name (without the _FILE suffix)
+    base_var=${var%_FILE}
+    # Read the content of the file specified in the variable
+    if [[ -f ${!var} ]]; then
+      # Export the new variable with the content of the file
+      export $base_var=$(cat "${!var}")
+    else
+      echo "Warning: File specified in $var does not exist."
+    fi
+  fi
+done
