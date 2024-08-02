@@ -4,20 +4,22 @@ services:
   openwebui:
     image: ghcr.io/open-webui/open-webui:main
     restart: unless-stopped
-    env_file:
-      - ../stack.env
+    command: chmod +x /scripts/env-file-reader.sh && /scripts/env-file-reader.sh && /app/backend/
     deploy:
       placement:
         constraints:
           - node.role == manager
     environment:
+      - DATABASE_URL_FILE=/run/secrets/open-webui-database
+      - SECRET_KEY_FILE=/run/secrets/open-webui-secret-key
       - ENABLE_SIGNUP=false
       - ENABLE_OAUTH_SIGNUP=true
-      - OAUTH_CLIENT_ID=${OAUTH_CLIENT_ID}
-      - OAUTH_CLIENT_SECRET=${OAUTH_CLIENT_SECRET}
-      - OPENID_PROVIDER_URL=${OPENID_PROVIDER_URL}
+      - OAUTH_CLIENT_ID_FILE=/run/secrets/open-webui-oauth-client-id
+      - OAUTH_CLIENT_SECRET_FILE=/run/secrets/open-webui-oauth-client-secret
+      - OPENID_PROVIDER_URL_FILE=/run/secrets/open-webui-openid-provider-url
     volumes:
       - open-webui_data:/app/backend/data
+      - scripts:/scripts
     networks:
       - nginx
       - databases
@@ -27,6 +29,8 @@ services:
 
 volumes:
   open-webui_data:
+    external: true
+  scripts:
     external: true
 
 networks:
@@ -40,4 +44,9 @@ secrets:
     external: true
   open-webui-secret-key:
     external: true
-
+  open-webui-oauth-client-id:
+    external: true
+  open-webui-oauth-client-secret:
+    external: true
+  open-webui-openid-provider-url:
+    external: true

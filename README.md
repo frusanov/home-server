@@ -123,6 +123,7 @@ Then connect portainer_portainer service to nginx network via Portainer UI
 ---
 ## Create volumes
 ```sh
+docker volume create scripts
 docker volume create backup_config
 docker volume create backup_data
 docker volume create shared
@@ -160,6 +161,9 @@ docker volume create owncloud_data
 `authentik_secret_key` - pwgen -s 50 1  
 `open-webui-database` - postgresql://postgres:password@postgres:5432/openwebui  
 `open-webui-secret-key`
+`open-webui-oauth-client-id`
+`open-webui-oauth-client-secret`
+`open-webui-openid-provider-url`
 
 
 ---
