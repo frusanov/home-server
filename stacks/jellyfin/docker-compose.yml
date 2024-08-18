@@ -1,8 +1,8 @@
-version: '3.8'
+version: "3.8"
 
 services:
   app:
-    image: lscr.io/linuxserver/jellyfin:latest
+    image: lscr.io/linuxserver/jellyfin:10.8.13
     restart: unless-stopped:3
     deploy:
       placement:
@@ -23,9 +23,8 @@ volumes:
   shared:
     external: true
   jellyfin_config:
-    external: true 
+    external: true
 
 networks:
   nginx:
     external: true
-
