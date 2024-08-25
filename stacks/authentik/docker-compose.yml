@@ -1,8 +1,8 @@
-version: '3.8'
+version: "3.8"
 
 services:
   server:
-    image: ghcr.io/goauthentik/server:2023.10.7
+    image: ghcr.io/goauthentik/server:2024.6.4
     restart: unless-stopped:3
     deploy:
       replicas: 1
@@ -40,7 +40,7 @@ services:
       - authentik_secret_key
       - postgres_password
   worker:
-    image: ghcr.io/goauthentik/server:2023.10.7
+    image: ghcr.io/goauthentik/server:2024.6.4
     restart: unless-stopped:3
     deploy:
       replicas: 1
@@ -105,4 +105,3 @@ networks:
     external: true
   nginx:
     external: true
-
