@@ -1,0 +1,25 @@
+- name: Deploy Samba stack
+  hosts: manager:!cloud
+  vars:
+    ansible_python_interpreter: /root/.ansible_venv/bin/python
+  tasks:
+    - name: Create samba_data volume
+      community.docker.docker_volume:
+        name: samba_data
+
+    - name: Create Samba stack directory
+      file:
+        path: /root/stacks/samba
+        state: directory
+
+    - name: Copy compose file to Samba stack directory
+      copy:
+        src: ../stacks/samba/compose.yaml
+        dest: /root/stacks/samba/compose.yaml
+
+    - name: Deploy Samba stack from a compose file
+      community.docker.docker_stack:
+        state: present
+        name: samba
+        compose:
+          - /root/stacks/samba/compose.yaml

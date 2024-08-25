@@ -1,0 +1,52 @@
+- name: Deploy databases stack
+  hosts: manager:!cloud
+  vars:
+    ansible_python_interpreter: /root/.ansible_venv/bin/python
+  vars_files:
+    - ../vault.yaml
+  tasks:
+    - name: Create mariadb_data volume
+      community.docker.docker_volume:
+        name: mariadb_data
+
+    - name: Create postgres_data volume
+      community.docker.docker_volume:
+        name: postgres_data
+
+    - name: Create redis_data volume
+      community.docker.docker_volume:
+        name: redis_data
+
+    - name: Create databases network
+      community.docker.docker_network:
+        name: databases
+        driver: overlay
+
+    - name: Secret mariadb_password
+      community.docker.docker_secret:
+        name: mariadb_password
+        data: "{{ mariadb_password }}"
+        state: present
+
+    - name: Secret postgres_password
+      community.docker.docker_secret:
+        name: postgres_password
+        data: "{{ postgres_password }}"
+        state: present
+
+    - name: Create databases stack directory
+      file:
+        path: /root/stacks/databases
+        state: directory
+
+    - name: Copy compose file to databases stack directory
+      copy:
+        src: ../stacks/databases/compose.yaml
+        dest: /root/stacks/databases/compose.yaml
+
+    - name: Deploy databases stack from a compose file
+      community.docker.docker_stack:
+        state: present
+        name: databases
+        compose:
+          - /root/stacks/databases/compose.yaml

@@ -1,0 +1,25 @@
+- name: Deploy Jellyfin stack
+  hosts: manager:!cloud
+  vars:
+    ansible_python_interpreter: /root/.ansible_venv/bin/python
+  tasks:
+    - name: Create jellyfin_config volume
+      community.docker.docker_volume:
+        name: jellyfin_config
+
+    - name: Create Jellyfin stack directory
+      file:
+        path: /root/stacks/jellyfin
+        state: directory
+
+    - name: Copy compose file to Jellyfin stack directory
+      copy:
+        src: ../stacks/jellyfin/compose.yaml
+        dest: /root/stacks/jellyfin/compose.yaml
+
+    - name: Deploy Jellyfin stack from a compose file
+      community.docker.docker_stack:
+        state: present
+        name: jellyfin
+        compose:
+          - /root/stacks/jellyfin/compose.yaml

@@ -1,0 +1,33 @@
+- name: Install base software
+  hosts: alpine
+  tasks:
+    - name: Check if community repository is enabled
+      shell: cat /etc/apk/repositories | egrep '^#(.+\/community)' || true
+      register: repositories
+      changed_when: false
+
+    - name: Enable community repository
+      shell: sed -i 's/#\(.*\/community\)/\1/' /etc/apk/repositories
+      changed_when:
+        - "'/community' in repositories.stdout"
+
+    - name: Install Base Software
+      apk:
+        name:
+          - py3-pip
+          - py3-virtualenv
+          - curl
+          - zsh
+          - git
+          - tmux
+          - nano
+          - htop
+          - docker
+          - docker-compose
+        state: present
+
+    - name: Start Docker Service
+      service:
+        name: docker
+        state: started
+        enabled: yes

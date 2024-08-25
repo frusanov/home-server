@@ -1,0 +1,7 @@
+- name: Apline Linux update software
+  hosts: alpine
+  remote_user: root
+  tasks:
+    - name: Update software
+      apk:
+        upgrade: true
