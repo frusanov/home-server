@@ -1,0 +1,27 @@
+- name: Deploy databases stack
+  hosts: manager:!cloud
+  vars:
+    ansible_python_interpreter: /root/.ansible_venv/bin/python
+  vars_files:
+    - ../vault.yaml
+  tasks:
+    - name: Create obsidian_data volume
+      community.docker.docker_volume:
+        name: obsidian_data
+
+    - name: Create obsidian stack directory
+      file:
+        path: /root/stacks/obsidian
+        state: directory
+
+    - name: Copy compose file to databases stack directory
+      copy:
+        src: ../stacks/obsidian/compose.yaml
+        dest: /root/stacks/obsidian/compose.yaml
+
+    - name: Deploy obsidian stack from a compose file
+      community.docker.docker_stack:
+        state: present
+        name: obsidian
+        compose:
+          - /root/stacks/obsidian/compose.yaml
