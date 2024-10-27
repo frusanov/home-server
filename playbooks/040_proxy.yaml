@@ -1,5 +1,9 @@
-- name: Deploy databases stack
-  hosts: manager
+- name: Deploy proxy stack
+  # hosts: manager
+  # temporary solution
+  # in future this service must presists in all clusters
+  # but with differents base settings
+  hosts: manager:&cloud
   vars:
     ansible_python_interpreter: /root/.ansible_venv/bin/python
   vars_files:
