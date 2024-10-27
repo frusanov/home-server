@@ -1,0 +1,61 @@
+services:
+  flowise:
+    image: flowiseai/flowise
+    restart: always
+    environment:
+      - PORT=3000
+      # - CORS_ORIGINS=${CORS_ORIGINS}
+      # - IFRAME_ORIGINS=${IFRAME_ORIGINS}
+      # - FLOWISE_USERNAME=${FLOWISE_USERNAME}
+      # - FLOWISE_PASSWORD=${FLOWISE_PASSWORD}
+      # - FLOWISE_FILE_SIZE_LIMIT=${FLOWISE_FILE_SIZE_LIMIT}
+
+      # - DEBUG=${DEBUG}
+
+      # - DATABASE_PATH=${DATABASE_PATH}
+      - DATABASE_TYPE=postgres
+      - DATABASE_PORT=5432
+      - DATABASE_HOST=databases_postgres
+      - DATABASE_NAME=flowise
+      - DATABASE_USER=postgres
+      # - DATABASE_PASSWORD_FILE=/run/secrets/postgres_password
+
+      - DISABLE_FLOWISE_TELEMETRY=true
+
+      - APIKEY_PATH=/mnt/flowise
+      - SECRETKEY_PATH=/mnt/flowise
+      # - FLOWISE_SECRETKEY_OVERWRITE=${FLOWISE_SECRETKEY_OVERWRITE}
+      # - LOG_LEVEL=${LOG_LEVEL}
+      - LOG_PATH=/mnt/flowise/logs
+      - BLOB_STORAGE_PATH=/mnt/flowise/storage
+      # - DISABLE_FLOWISE_TELEMETRY=${DISABLE_FLOWISE_TELEMETRY}
+      # - MODEL_LIST_CONFIG_JSON=${MODEL_LIST_CONFIG_JSON}
+    ports:
+      - 3222:3000
+    volumes:
+      - flowise:/mnt/flowise
+      - obsidian:/mnt/obsidian
+    networks:
+      - databases
+      - proxy
+    secrets:
+      - postgres_password
+    labels:
+      - "forceUpdate=2024.10.27_15.55"
+    entrypoint: /bin/sh -c "export DATABASE_PASSWORD=$$(cat /run/secrets/postgres_password); sleep 3; flowise start"
+
+networks:
+  databases:
+    external: true
+  proxy:
+    external: true
+
+volumes:
+  flowise:
+    external: true
+  obsidian:
+    external: true
+
+secrets:
+  postgres_password:
+    external: true

@@ -1,0 +1,67 @@
+- name: Deploy Flowise stack
+  hosts: manager:!cloud
+  vars:
+    ansible_python_interpreter: /root/.ansible_venv/bin/python
+  vars_files:
+    - ../vault.yaml
+  tasks:
+    - name: Create flowise_data volume
+      community.docker.docker_volume:
+        name: flowise_data
+
+    - name: Create flowise stack directory
+      file:
+        path: /root/stacks/flowise
+        state: directory
+
+    - name: Copy compose file to AI stack directory
+      copy:
+        src: ../stacks/flowise/compose.yaml
+        dest: /root/stacks/flowise/compose.yaml
+
+    - name: Create .env file
+      copy:
+        content: |
+          DATABASE_PASSWORD={{ postgres_password }}
+
+          # FLOWISE_USERNAME=user
+          # FLOWISE_PASSWORD=1234
+          # FLOWISE_SECRETKEY_OVERWRITE=myencryptionkey
+          # FLOWISE_FILE_SIZE_LIMIT=50mb
+
+          # DISABLE_CHATFLOW_REUSE=true
+
+          # DEBUG=true
+          # LOG_LEVEL=info (error | warn | info | verbose | debug)
+          # TOOL_FUNCTION_BUILTIN_DEP=crypto,fs
+          # TOOL_FUNCTION_EXTERNAL_DEP=moment,lodash
+
+          # LANGCHAIN_TRACING_V2=true
+          # LANGCHAIN_ENDPOINT=https://api.smith.langchain.com
+          # LANGCHAIN_API_KEY=your_api_key
+          # LANGCHAIN_PROJECT=your_project
+
+          # Uncomment the following line to enable model list config, load the list of models from your local config file
+          # see https://raw.githubusercontent.com/FlowiseAI/Flowise/main/packages/components/models.json for the format
+          # MODEL_LIST_CONFIG_JSON=/your_model_list_config_file_path
+
+          STORAGE_TYPE=local
+          # STORAGE_TYPE=local (local | s3)
+          BLOB_STORAGE_PATH=/mnt/flowise/storage
+          # S3_STORAGE_BUCKET_NAME=flowise
+          # S3_STORAGE_ACCESS_KEY_ID=<your-access-key>
+          # S3_STORAGE_SECRET_ACCESS_KEY=<your-secret-key>
+          # S3_STORAGE_REGION=us-west-2
+          # S3_ENDPOINT_URL=<custom-s3-endpoint-url>
+          # S3_FORCE_PATH_STYLE=false
+
+          # APIKEY_STORAGE_TYPE=json (json | db)
+          SHOW_COMMUNITY_NODES=true
+        dest: /root/stacks/flowise/.env
+
+    - name: Deploy Flowise stack from a compose file
+      community.docker.docker_stack:
+        state: present
+        name: flowise
+        compose:
+          - /root/stacks/flowise/compose.yaml
