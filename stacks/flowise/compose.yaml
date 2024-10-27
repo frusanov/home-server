@@ -18,23 +18,21 @@ services:
       - DATABASE_HOST=databases_postgres
       - DATABASE_NAME=flowise
       - DATABASE_USER=postgres
-      # - DATABASE_PASSWORD_FILE=/run/secrets/postgres_password
 
       - DISABLE_FLOWISE_TELEMETRY=true
 
+      - TOOL_FUNCTION_BUILTIN_DEP=*
+      - TOOL_FUNCTION_EXTERNAL_DEP=axios,lodash,date-fns
+
       - APIKEY_PATH=/mnt/flowise
       - SECRETKEY_PATH=/mnt/flowise
-      # - FLOWISE_SECRETKEY_OVERWRITE=${FLOWISE_SECRETKEY_OVERWRITE}
-      # - LOG_LEVEL=${LOG_LEVEL}
       - LOG_PATH=/mnt/flowise/logs
       - BLOB_STORAGE_PATH=/mnt/flowise/storage
-      # - DISABLE_FLOWISE_TELEMETRY=${DISABLE_FLOWISE_TELEMETRY}
-      # - MODEL_LIST_CONFIG_JSON=${MODEL_LIST_CONFIG_JSON}
     ports:
       - 3222:3000
     volumes:
-      - flowise:/mnt/flowise
-      - obsidian:/mnt/obsidian
+      - flowise_data:/mnt/flowise
+      - obsidian_data:/mnt/obsidian
     networks:
       - databases
       - proxy
@@ -51,9 +49,9 @@ networks:
     external: true
 
 volumes:
-  flowise:
+  flowise_data:
     external: true
-  obsidian:
+  obsidian_data:
     external: true
 
 secrets:
