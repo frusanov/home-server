@@ -22,7 +22,7 @@ services:
       - DISABLE_FLOWISE_TELEMETRY=true
 
       - TOOL_FUNCTION_BUILTIN_DEP=*
-      - TOOL_FUNCTION_EXTERNAL_DEP=axios,lodash,date-fns
+      - TOOL_FUNCTION_EXTERNAL_DEP=axios,lodash,date-fns,recursive-readdir-files,file-type,isbinaryfile
 
       - APIKEY_PATH=/mnt/flowise
       - SECRETKEY_PATH=/mnt/flowise
