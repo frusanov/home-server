@@ -1,0 +1,9 @@
+- name: Init Swarm Manager
+  hosts: manager
+  vars:
+    ansible_python_interpreter: /root/.ansible_venv/bin/python
+  tasks:
+    - name: Init a new swarm with default parameters
+      community.docker.docker_swarm:
+        state: present
+        advertise_addr: "{{ ansible_default_ipv4.address }}"

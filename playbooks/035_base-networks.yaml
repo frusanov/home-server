@@ -1,0 +1,9 @@
+- name: Setup base networks
+  hosts: manager
+  vars:
+    ansible_python_interpreter: /root/.ansible_venv/bin/python
+  tasks:
+    - name: Create proxy network
+      community.docker.docker_network:
+        name: proxy
+        driver: overlay

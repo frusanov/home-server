@@ -1,0 +1,48 @@
+- name: Deploy Authentik stack
+  hosts: manager:!cloud
+  vars:
+    ansible_python_interpreter: /root/.ansible_venv/bin/python
+  vars_files:
+    - ../vault.yaml
+  tasks:
+    - name: Create authentik_media volume
+      community.docker.docker_volume:
+        name: authentik_media
+
+    - name: Create authentik_certs volume
+      community.docker.docker_volume:
+        name: authentik_certs
+
+    - name: Create authentik_templates volume
+      community.docker.docker_volume:
+        name: authentik_templates
+
+    - name: Secret authentik_secret_key
+      community.docker.docker_secret:
+        name: authentik_secret_key
+        data: "{{ authentik_secret_key }}"
+        state: present
+
+    - name: Create authentik database
+      community.postgresql.postgresql_db:
+        name: authentik
+        login_host: "{{ ansible_default_ipv4.address }}"
+        login_user: "postgres"
+        login_password: "{{ postgres_password }}"
+
+    - name: Create authentik stack directory
+      file:
+        path: /root/stacks/authentik
+        state: directory
+
+    - name: Copy compose file to authentik stack directory
+      copy:
+        src: ../stacks/authentik/compose.yaml
+        dest: /root/stacks/authentik/compose.yaml
+
+    - name: Deploy authentik stack from a compose file
+      community.docker.docker_stack:
+        state: present
+        name: authentik
+        compose:
+          - /root/stacks/authentik/compose.yaml

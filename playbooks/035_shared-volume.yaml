@@ -1,0 +1,8 @@
+- name: Setup shared volume
+  hosts: manager:!cloud
+  vars:
+    ansible_python_interpreter: /root/.ansible_venv/bin/python
+  tasks:
+    - name: Create shared volume
+      community.docker.docker_volume:
+        name: shared

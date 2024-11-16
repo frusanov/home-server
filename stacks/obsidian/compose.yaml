@@ -1,0 +1,26 @@
+services:
+  obsidian:
+    image: lscr.io/linuxserver/obsidian:latest
+    container_name: obsidian
+    # security_opt:
+    #   - seccomp:unconfined #optional
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    ports:
+      - 3220:3000
+    volumes:
+      - obsidian_data:/config
+    devices:
+      - /dev/dri:/dev/dri
+    shm_size: "1gb"
+    restart: unless-stopped
+
+volumes:
+  obsidian_data:
+    external: true
+
+networks:
+  proxy:
+    external: true

@@ -1,0 +1,16 @@
+- name: Create Ansible venv
+  hosts: all
+  tasks:
+    - name: Create Ansible venv
+      command: python3 -m venv /root/.ansible_venv
+      args:
+        creates: "/root/.ansible_venv"
+
+    - name: Install pip packages
+      pip:
+        name:
+          - docker
+          - jsondiff
+          - psycopg2-binary
+        virtualenv: "/root/.ansible_venv"
+        state: present

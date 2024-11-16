@@ -1,0 +1,33 @@
+- name: Deploy utils stack
+  hosts: manager:!cloud
+  vars:
+    ansible_python_interpreter: /root/.ansible_venv/bin/python
+  vars_files:
+    - ../vault.yaml
+  tasks:
+    - name: Create semaphore_config volume
+      community.docker.docker_volume:
+        name: semaphore_config
+
+    - name: Secret semaphore_admin_password
+      community.docker.docker_secret:
+        name: semaphore_admin_password
+        data: "{{ semaphore_admin_password }}"
+        state: present
+
+    - name: Create utils stack directory
+      file:
+        path: /root/stacks/utils
+        state: directory
+
+    - name: Copy compose file to utils stack directory
+      copy:
+        src: ../stacks/utils/compose.yaml
+        dest: /root/stacks/utils/compose.yaml
+
+    - name: Deploy utils stack from a compose file
+      community.docker.docker_stack:
+        state: present
+        name: utils
+        compose:
+          - /root/stacks/utils/compose.yaml

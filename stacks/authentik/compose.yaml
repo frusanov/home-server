@@ -30,15 +30,18 @@ services:
       AUTHENTIK_POSTGRESQL__USER: postgres
       AUTHENTIK_POSTGRESQL__NAME: authentik
       AUTHENTIK_POSTGRESQL__PASSWORD: file:///run/secrets/postgres_password
+      AUTHENTIK_LISTEN__HTTP: 0.0.0.0:9001
     volumes:
       - authentik_media:/media
       - authentik_templates:/templates
     networks:
       - databases
       - nginx
+      - proxy
     secrets:
       - authentik_secret_key
       - postgres_password
+
   worker:
     image: ghcr.io/goauthentik/server:2024.6.4
     restart: unless-stopped:3
@@ -68,6 +71,7 @@ services:
       AUTHENTIK_POSTGRESQL__USER: postgres
       AUTHENTIK_POSTGRESQL__NAME: authentik
       AUTHENTIK_POSTGRESQL__PASSWORD: file:///run/secrets/postgres_password
+      AUTHENTIK_LISTEN__HTTP: 0.0.0.0:9001
     # `user: root` and the docker socket volume are optional.
     # See more for the docker socket integration here:
     # https://goauthentik.io/docs/outposts/integrations/docker
@@ -104,4 +108,6 @@ networks:
   databases:
     external: true
   nginx:
+    external: true
+  proxy:
     external: true

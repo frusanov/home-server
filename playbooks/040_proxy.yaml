@@ -1,0 +1,31 @@
+- name: Deploy proxy stack
+  # hosts: manager
+  # temporary solution
+  # in future this service must presists in all clusters
+  # but with differents base settings
+  hosts: manager:&cloud
+  vars:
+    ansible_python_interpreter: /root/.ansible_venv/bin/python
+  vars_files:
+    - ../vault.yaml
+  tasks:
+    - name: Create traefik-certs volume
+      community.docker.docker_volume:
+        name: traefik-certs
+
+    - name: Create proxy stack directory
+      file:
+        path: /root/stacks/proxy
+        state: directory
+
+    - name: Copy compose file to proxy stack directory
+      copy:
+        src: ../stacks/proxy/compose.yaml
+        dest: /root/stacks/proxy/compose.yaml
+
+    - name: Deploy proxy stack from a compose file
+      community.docker.docker_stack:
+        state: present
+        name: proxy
+        compose:
+          - /root/stacks/proxy/compose.yaml

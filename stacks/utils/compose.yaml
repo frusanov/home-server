@@ -1,0 +1,50 @@
+version: "3.8"
+
+services:
+  semaphore:
+    image: semaphoreui/semaphore:v2.10.22
+    restart: unless-stopped
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+    environment:
+      SEMAPHORE_DB_DIALECT: postgres
+      SEMAPHORE_DB_HOST: databases_postgres:5432
+      SEMAPHORE_DB_NAME: semaphore
+      SEMAPHORE_DB_USER: postgres
+      SEMAPHORE_DB_PASS_FILE: /run/secrets/postgres_password
+      SEMAPHORE_ADMIN: admin
+      SEMAPHORE_ADMIN_PASSWORD_FILE: /run/secrets/semaphore_admin_password
+      SEMAPHORE_ADMIN_NAME: Admin
+      SEMAPHORE_ADMIN_EMAIL: admin@localhost
+    volumes:
+      - /tmp:/tmp
+      - semaphore_config:/etc/semaphore
+    ports:
+      - 3000:3000
+    networks:
+      - databases
+      - nginx
+      - proxy
+    secrets:
+      - postgres_password
+      - semaphore_admin_password
+
+secrets:
+  postgres_password:
+    external: true
+  semaphore_admin_password:
+    external: true
+
+volumes:
+  semaphore_config:
+    external: true
+
+networks:
+  databases:
+    external: true
+  nginx:
+    external: true
+  proxy:
+    external: true

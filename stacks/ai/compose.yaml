@@ -1,0 +1,89 @@
+version: "3.4"
+
+services:
+  librechat:
+    depends_on:
+      - mongodb
+      - rag_api
+    image: ghcr.io/danny-avila/librechat:v0.7.5-rc2
+    restart: always
+    environment:
+      - HOST=0.0.0.0
+      - MONGO_URI=mongodb://ai_mongodb:27017/LibreChat
+      - MEILI_HOST=http://ai_meilisearch:7700
+      - RAG_PORT=8000
+      - RAG_API_URL=http://ai_rag_api:8000
+    volumes:
+      - ./.env:/app/.env:ro
+      - ./librechat.yaml:/app/librechat.yaml:ro
+      - librechat_images:/app/client/public/images
+    networks:
+      - proxy
+      - ai
+    labels:
+      - "forceUpdate=2024.09.13_01.32"
+      - "traefik.enable=true"
+      - "traefik.http.routers.librechat.rule=Host(`ai.rusanov.cloud`)"
+      - "traefik.http.routers.librechat.entrypoints=websecure"
+      - "traefik.http.routers.librechat.tls.certresolver=letencrypt"
+      - "traefik.docker.network=proxy"
+
+  mongodb:
+    image: mongo
+    restart: always
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - ai
+    command: mongod --noauth
+
+  meilisearch:
+    image: getmeili/meilisearch:v1.7.3
+    restart: always
+    environment:
+      - MEILI_HOST=http://ai_meilisearch:7700
+      - MEILI_NO_ANALYTICS=true
+    volumes:
+      - meili_data:/meili_data
+    networks:
+      - ai
+
+  vectordb:
+    image: ankane/pgvector:latest
+    env_file:
+      - .env
+    restart: always
+    volumes:
+      - pgvector_data:/var/lib/postgresql/data
+    networks:
+      - ai
+
+  rag_api:
+    image: ghcr.io/danny-avila/librechat-rag-api-dev-lite:latest
+    environment:
+      - VECTOR_DB_TYPE=pgvector
+      - DB_HOST=ai_vectordb
+      - RAG_PORT=8000
+    restart: always
+    networks:
+      - ai
+    depends_on:
+      - vectordb
+    env_file:
+      - .env
+
+volumes:
+  pgvector_data:
+    external: true
+  librechat_images:
+    external: true
+  mongodb_data:
+    external: true
+  meili_data:
+    external: true
+
+networks:
+  ai:
+    external: true
+  proxy:
+    external: true
