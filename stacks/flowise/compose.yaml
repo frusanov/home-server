@@ -1,14 +1,20 @@
 services:
-  # sidecar:
-  #   image: sidecar:local
-  #   deploy:
-  #     placement:
-  #       constraints:
-  #         - node.labels.bun == true
+  sidecar:
+    image: sidecar:local
+    volumes:
+      - obsidian_data:/mnt/obsidian
+    deploy:
+      placement:
+        constraints:
+          - node.labels.bun == true
 
   flowise:
     image: flowiseai/flowise
     restart: always
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
     environment:
       - PORT=3000
       # - CORS_ORIGINS=${CORS_ORIGINS}
