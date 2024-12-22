@@ -10,9 +10,6 @@ entryPoints:
   websecure:
     address: ":443"
 
-log:
-  level: DEBUG
-
 certificatesResolvers:
   default-acme:
     acme:

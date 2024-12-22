@@ -20,7 +20,7 @@ services:
     networks:
       - proxy
     labels:
-      - "forceUpdate=2024.12.22-19:52"
+      - "forceUpdate=2024.12.22-21:16"
 
 volumes:
   traefik_certs:
