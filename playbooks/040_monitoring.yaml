@@ -27,6 +27,11 @@
         state: restarted
       when: docker_config.changed
 
+    - name: Create monitoring network
+      community.docker.docker_network:
+        name: monitoring
+        driver: overlay
+
     - name: Create prometheus_data volume
       community.docker.docker_volume:
         name: prometheus_data
@@ -50,7 +55,7 @@
         src: ../stacks/monitoring/prometheus.yaml
         dest: /root/stacks/monitoring/prometheus.yaml
 
-    - name: Deploy databases stack from a compose file
+    - name: Deploy monitoring stack from a compose file
       community.docker.docker_stack:
         state: present
         name: monitoring

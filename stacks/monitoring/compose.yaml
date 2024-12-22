@@ -9,6 +9,8 @@ services:
       - 9090:9090
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    networks:
+      - monitoring
     volumes:
       - ./prometheus.yaml:/etc/prometheus/prometheus.yml
       - prometheus_data:/prometheus
@@ -24,6 +26,8 @@ services:
         constraints:
           - node.platform.os == linux
     hostname: "{{.Node.Hostname}}"
+    networks:
+      - monitoring
     volumes:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
@@ -40,6 +44,8 @@ services:
       placement:
         constraints:
           - node.role == manager
+    networks:
+      - monitoring
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:rw
@@ -50,19 +56,30 @@ services:
 
   redis:
     image: redis:latest
+    networks:
+      - monitoring
     deploy:
       placement:
         constraints:
           - node.role == manager
 
   grafana:
-    image: grafana/grafana
+    image: grafana/grafana-oss:11.4.0
+    ports:
+      - 3002:3000
     deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.services.grafana.loadbalancer.server.port=3000"
+        - "traefik.http.routers.grafana.rule=Host(`grafana.rusanov.cloud`)"
+        - "traefik.http.routers.grafana.entrypoints=websecure"
+        - "traefik.http.routers.grafana.tls.certresolver=default-acme"
       placement:
         constraints:
           - node.role == manager
-    ports:
-      - 3002:3000
+    networks:
+      - monitoring
+      - proxy
     volumes:
       - grafana_data:/var/lib/grafana
 
@@ -70,4 +87,10 @@ volumes:
   prometheus_data:
     external: true
   grafana_data:
+    external: true
+
+networks:
+  monitoring:
+    external: true
+  proxy:
     external: true
