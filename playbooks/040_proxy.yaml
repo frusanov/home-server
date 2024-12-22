@@ -1,17 +1,13 @@
 - name: Deploy proxy stack
-  # hosts: manager
-  # temporary solution
-  # in future this service must presists in all clusters
-  # but with differents base settings
-  hosts: manager:&cloud
+  hosts: manager
   vars:
     ansible_python_interpreter: /root/.ansible_venv/bin/python
   vars_files:
     - ../vault.yaml
   tasks:
-    - name: Create traefik-certs volume
+    - name: Create traefik_certs volume
       community.docker.docker_volume:
-        name: traefik-certs
+        name: traefik_certs
 
     - name: Create proxy stack directory
       file:
@@ -23,9 +19,54 @@
         src: ../stacks/proxy/compose.yaml
         dest: /root/stacks/proxy/compose.yaml
 
-    - name: Deploy proxy stack from a compose file
+    - name: Copy compose.cloud file to proxy stack directory
+      copy:
+        src: ../stacks/proxy/compose.cloud.yaml
+        dest: /root/stacks/proxy/compose.cloud.yaml
+      when: inventory_hostname in groups['cloud']
+
+    - name: Copy compose.home file to proxy stack directory
+      copy:
+        src: ../stacks/proxy/compose.home.yaml
+        dest: /root/stacks/proxy/compose.home.yaml
+      when: inventory_hostname not in groups['cloud']
+
+    - name: Copy Traefik config
+      copy:
+        src: ../stacks/proxy/config.yaml
+        dest: /root/stacks/proxy/config.yaml
+
+    - name: Create dynamic configs directory
+      file:
+        path: /root/stacks/proxy/dynamic
+        state: directory
+
+    - name: Copy proxy-to-home dynamic config
+      copy:
+        src: ../stacks/proxy/proxy-to-home.yaml
+        dest: /root/stacks/proxy/dynamic/proxy-to-home.yaml
+      when: inventory_hostname in groups['cloud']
+
+    - name: Create .env file
+      copy:
+        content: |
+          CF_DNS_API_TOKEN={{ stacks.proxy.env.CF_DNS_API_TOKEN }}
+        dest: /root/stacks/proxy/.env
+
+    - name: Deploy proxy stack from a compose file on cloud server
       community.docker.docker_stack:
         state: present
         name: proxy
         compose:
           - /root/stacks/proxy/compose.yaml
+          - /root/stacks/proxy/compose.cloud.yaml
+      when: inventory_hostname in groups['cloud']
+
+    - name: Deploy proxy stack from a compose file on home server
+      community.docker.docker_stack:
+        state: present
+        name: proxy
+        compose:
+          - /root/stacks/proxy/compose.yaml
+          - /root/stacks/proxy/compose.home.yaml
+      when: inventory_hostname not in groups['cloud']

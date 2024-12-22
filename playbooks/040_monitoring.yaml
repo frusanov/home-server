@@ -1,0 +1,58 @@
+- name: Deploy monitoring stack
+  hosts: manager:!cloud
+  vars:
+    ansible_python_interpreter: /root/.ansible_venv/bin/python
+  vars_files:
+    - ../vault.yaml
+  tasks:
+    - name: Create docker config directory
+      file:
+        path: /etc/docker
+        state: directory
+        mode: "0755"
+
+    - name: Enable docker monitoring
+      copy:
+        content: |
+          {
+            "metrics-addr": "0.0.0.0:9323",
+            "experimental" : true
+          }
+        dest: /etc/docker/daemon.json
+      register: docker_config
+
+    - name: Restart Docker service if config changed
+      service:
+        name: docker
+        state: restarted
+      when: docker_config.changed
+
+    - name: Create prometheus_data volume
+      community.docker.docker_volume:
+        name: prometheus_data
+
+    - name: Create grafana_data volume
+      community.docker.docker_volume:
+        name: grafana_data
+
+    - name: Create monitoring stack directory
+      file:
+        path: /root/stacks/monitoring
+        state: directory
+
+    - name: Copy compose file to monitoring stack directory
+      copy:
+        src: ../stacks/monitoring/compose.yaml
+        dest: /root/stacks/monitoring/compose.yaml
+
+    - name: Copy prometheus config to monitoring stack directory
+      copy:
+        src: ../stacks/monitoring/prometheus.yaml
+        dest: /root/stacks/monitoring/prometheus.yaml
+
+    - name: Deploy databases stack from a compose file
+      community.docker.docker_stack:
+        state: present
+        name: monitoring
+        compose:
+          - /root/stacks/monitoring/compose.yaml

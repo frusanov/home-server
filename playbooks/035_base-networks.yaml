@@ -7,3 +7,4 @@
       community.docker.docker_network:
         name: proxy
         driver: overlay
+        attachable: true

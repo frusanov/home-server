@@ -1,0 +1,11 @@
+services:
+  traefik:
+    deploy:
+      labels:
+        - "forceUpdate=2024.12.22-04:23"
+        - "traefik.enable=true"
+        - "traefik.http.services.traefik.loadbalancer.server.port=8080"
+        - "traefik.http.routers.traefik.rule=Host(`traefik.rusanov.cloud`)"
+        - "traefik.http.routers.traefik.entrypoints=websecure"
+        - "traefik.http.routers.traefik.tls.certresolver=default-acme"
+        - "traefik.http.routers.traefik.service=api@internal"

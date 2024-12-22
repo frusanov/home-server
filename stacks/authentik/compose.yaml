@@ -5,6 +5,13 @@ services:
     image: ghcr.io/goauthentik/server:2024.6.4
     restart: unless-stopped:3
     deploy:
+      labels:
+        - "forceUpdate=2024.09.13_01.32"
+        - "traefik.enable=true"
+        - "traefik.http.services.authentik.loadbalancer.server.port=9001"
+        - "traefik.http.routers.authentik.rule=Host(`auth.rusanov.cloud`)"
+        - "traefik.http.routers.authentik.entrypoints=websecure"
+        - "traefik.http.routers.authentik.tls.certresolver=default-acme"
       replicas: 1
       update_config:
         parallelism: 2

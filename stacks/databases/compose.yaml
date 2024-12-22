@@ -71,7 +71,7 @@ services:
       - 8080:8080
     networks:
       - nginx
-      - proxy
+      # - proxy
       - databases
 
 secrets:
@@ -93,5 +93,5 @@ networks:
     external: true
   nginx:
     external: true
-  proxy:
-    external: true
+  # proxy:
+  #   external: true

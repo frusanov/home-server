@@ -1,0 +1,14 @@
+tcp:
+  services:
+    home:
+      loadBalancer:
+        servers:
+          - address: 100.67.25.116:443
+
+  routers:
+    home:
+      rule: "HostSNI(`*`)"
+      priority: 10
+      service: home
+      tls:
+        passthrough: true
