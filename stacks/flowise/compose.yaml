@@ -52,7 +52,7 @@ services:
     secrets:
       - postgres_password
     labels:
-      - "forceUpdate=2024.10.27_15.55"
+      - "forceUpdate=2025.02.26_18:38"
     entrypoint: /bin/sh -c "export DATABASE_PASSWORD=$$(cat /run/secrets/postgres_password); sleep 3; flowise start"
 
 networks:
