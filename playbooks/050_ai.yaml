@@ -39,9 +39,14 @@
     - name: Create librechat.yaml file
       copy:
         content: |
-          version: 1.1.6
+          version: 1.2.1
 
           cache: true
+
+          endpoints:
+            agents:
+              recursionLimit: 50
+              disableBuilder: false
 
           speech:
             stt:
@@ -99,7 +104,7 @@
           #                     Endpoints                     #
           #===================================================#
 
-          ENDPOINTS=openAI,assistants,gptPlugins
+          ENDPOINTS=openAI,agents,gptPlugins
           # ,azureOpenAI,bingAI,google,gptPlugins,anthropic
 
           # PROXY=
@@ -171,7 +176,7 @@
           #============#
 
           OPENAI_API_KEY={{ api_keys.openai }}
-          OPENAI_MODELS=chatgpt-4o-latest,gpt-4o,gpt-4o-mini,gpt-4-turbo,o1-mini
+          OPENAI_MODELS=chatgpt-4o-latest,gpt-4o,gpt-4o-mini,gpt-4-turbo,o3-mini
 
           DEBUG_OPENAI=false
 
