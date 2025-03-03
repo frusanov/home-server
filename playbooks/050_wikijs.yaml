@@ -1,0 +1,21 @@
+- name: Deploy WikiJS
+  hosts: manager:!cloud
+  vars:
+    ansible_python_interpreter: /root/.ansible_venv/bin/python
+  tasks:
+    - name: Create WikiJS stack directory
+      file:
+        path: /root/stacks/wikijs
+        state: directory
+
+    - name: Copy compose file to WikiJS stack directory
+      copy:
+        src: ../stacks/wikijs/compose.yaml
+        dest: /root/stacks/wikijs/compose.yaml
+
+    - name: Deploy WikiJS stack from a compose file
+      community.docker.docker_stack:
+        state: present
+        name: wikijs
+        compose:
+          - /root/stacks/wikijs/compose.yaml
