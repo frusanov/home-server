@@ -1,4 +1,4 @@
-version: '3.3'
+version: "3.3"
 
 #
 # The Firefly III Data Importer will ask you for the Firefly III URL and a "Client ID".
@@ -10,11 +10,19 @@ version: '3.3'
 
 services:
   app:
-    image: fireflyiii/core:latest
+    image: fireflyiii/core:version-6
     hostname: app
+    deploy:
+      labels:
+        - "forceUpdate=2024.09.13_01.32"
+        - "traefik.enable=true"
+        - "traefik.http.services.firefly.loadbalancer.server.port=8080"
+        - "traefik.http.routers.firefly.rule=Host(`money.rusanov.cloud`)"
+        - "traefik.http.routers.firefly.entrypoints=websecure"
+        - "traefik.http.routers.firefly.tls.certresolver=default-acme"
     networks:
       - databases
-      - nginx
+      - proxy
     restart: unless-stopped
     volumes:
       - firefly_upload:/var/www/html/storage/upload
@@ -24,7 +32,8 @@ services:
       - firefly_cron_token
     environment:
       # https://raw.githubusercontent.com/firefly-iii/firefly-iii/main/.env.example
-      TRUSTED_PROXIES: '*'
+      VANITY_URL: https://money.rusanov.cloud
+      TRUSTED_PROXIES: "*"
       APP_KEY_FILE: /run/secrets/firefly_app_key
       STATIC_CRON_TOKEN_FILE: /run/secrets/firefly_cron_token
       DB_CONNECTION: pgsql
@@ -54,7 +63,7 @@ services:
     restart: unless-stopped
     command: sh -c "echo \"0 3 * * * wget -qO- http://firefly_app:8080/api/v1/cron/$$(cat /run/secrets/firefly_cron_token)\" | crontab - && crond -f -L /dev/stdout"
     networks:
-      - nginx
+      - proxy
     secrets:
       - firefly_cron_token
 
@@ -73,5 +82,5 @@ volumes:
 networks:
   databases:
     external: true
-  nginx:
+  proxy:
     external: true

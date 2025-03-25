@@ -1,0 +1,46 @@
+- name: Deploy Firefly stack
+  hosts: manager:!cloud
+  vars:
+    ansible_python_interpreter: /root/.ansible_venv/bin/python
+  vars_files:
+    - ../vault.yaml
+  tasks:
+    - name: Create firefly_upload volume
+      community.docker.docker_volume:
+        name: firefly_upload
+
+    - name: Secret firefly_app_key
+      community.docker.docker_secret:
+        name: firefly_app_key
+        data: "{{ stacks.firefly.env.APP_KEY }}"
+        state: present
+
+    - name: Secret firefly_cron_token
+      community.docker.docker_secret:
+        name: firefly_cron_token
+        data: "{{ stacks.firefly.env.STATIC_CRON_TOKEN }}"
+        state: present
+
+    - name: Create firefly database
+      community.postgresql.postgresql_db:
+        name: firefly
+        login_host: "{{ ansible_default_ipv4.address }}"
+        login_user: "postgres"
+        login_password: "{{ postgres_password }}"
+
+    - name: Create firefly stack directory
+      file:
+        path: /root/stacks/firefly
+        state: directory
+
+    - name: Copy compose file to firefly stack directory
+      copy:
+        src: ../stacks/firefly/compose.yaml
+        dest: /root/stacks/firefly/compose.yaml
+
+    - name: Deploy firefly stack from a compose file
+      community.docker.docker_stack:
+        state: present
+        name: firefly
+        compose:
+          - /root/stacks/firefly/compose.yaml
