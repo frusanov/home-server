@@ -3,7 +3,7 @@ version: '3.8'
 services:
   transmission:
     image: lscr.io/linuxserver/transmission:latest
-    restart: unless-stopped:3
+    restart: unless-stopped
     deploy:
       placement:
         constraints:
@@ -15,13 +15,14 @@ services:
       - TZ=Etc/UTC
       - USER=transmission
     volumes:
-      - transmission_config:/config
+      - transmission:/config
       - shared:/downloads
     ports:
+      - 9091:9091
       - 51413:51413
       - 51413:51413/udp
     networks:
-      - nginx
+      - proxy
     secrets:
       - transmission_password
 
@@ -32,10 +33,9 @@ secrets:
 volumes:
   shared:
     external: true
-  transmission_config:
+  transmission:
     external: true
 
 networks:
-  nginx:
+  proxy:
     external: true
-

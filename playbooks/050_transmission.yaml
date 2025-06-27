@@ -1,0 +1,33 @@
+- name: Deploy Transmission stack
+  hosts: manager:!cloud
+  vars:
+    ansible_python_interpreter: /root/.ansible_venv/bin/python
+  vars_files:
+    - ../vault.yaml
+  tasks:
+    - name: Create transmission volume
+      community.docker.docker_volume:
+        name: transmission
+
+    - name: Secret transmission_password
+      community.docker.docker_secret:
+        name: transmission_password
+        data: "{{ transmission_password }}"
+        state: present
+
+    - name: Create Transmission stack directory
+      file:
+        path: /root/stacks/transmission
+        state: directory
+
+    - name: Copy compose file to Transmission stack directory
+      copy:
+        src: ../stacks/transmission/compose.yaml
+        dest: /root/stacks/transmission/compose.yaml
+
+    - name: Deploy Transmission stack from a compose file
+      community.docker.docker_stack:
+        state: present
+        name: transmission
+        compose:
+          - /root/stacks/transmission/compose.yaml
