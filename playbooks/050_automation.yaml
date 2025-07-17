@@ -1,0 +1,27 @@
+- name: Deploy Flowise stack
+  hosts: manager:!cloud
+  vars:
+    ansible_python_interpreter: /root/.ansible_venv/bin/python
+  vars_files:
+    - ../vault.yaml
+  tasks:
+    - name: Create n8n_data volume
+      community.docker.docker_volume:
+        name: n8n_data
+
+    - name: Create automation stack directory
+      file:
+        path: /root/stacks/automation
+        state: directory
+
+    - name: Copy compose file to automation stack directory
+      copy:
+        src: ../stacks/automation/compose.yaml
+        dest: /root/stacks/automation/compose.yaml
+
+    - name: Deploy automation stack from a compose file
+      community.docker.docker_stack:
+        state: present
+        name: automation
+        compose:
+          - /root/stacks/automation/compose.yaml
