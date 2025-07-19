@@ -7,6 +7,9 @@ services:
       - TZ=Asia/Bangkok
       - N8N_EDITOR_BASE_URL=https://n8n.rusanov.cloud
       - WEBHOOK_URL=https://n8n.rusanov.cloud
+      - NODE_FUNCTION_ALLOW_BUILTIN=*
+      - NODE_FUNCTION_ALLOW_EXTERNAL=*
+      - N8N_COMMUNITY_PACKAGES_ALLOW_TOOL_USAGE=true
     volumes:
       - n8n_data:/home/node/.n8n
     networks:
