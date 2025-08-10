@@ -39,9 +39,7 @@
     - name: Create librechat.yaml file
       copy:
         content: |
-          version: 1.2.1
-
-          cache: true
+          version: 1.2.8
 
           endpoints:
             agents:
@@ -58,6 +56,56 @@
                 apiKey: '{{ api_keys.openai }}'
                 model: 'tts-1'
                 voices: ['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer']
+
+          memory:
+            disabled: false
+            validKeys:
+              - "user_preferences"
+              - "conversation_context"
+              - "learned_facts"
+              - "personal_information"
+            tokenLimit: 3000
+            personalize: true
+            messageWindowSize: 8
+            agent:
+              provider: "openAI"
+              model: "gpt-5-mini"
+              instructions: |
+                Store memory using only the specified validKeys. For user_preferences: save
+                explicitly stated preferences about communication style, topics of interest,
+                or workflow preferences. For conversation_context: save important facts or
+                ongoing projects mentioned. For learned_facts: save objective information
+                about the user. For personal_information: save only what the user explicitly
+                shares about themselves. Delete outdated or incorrect information promptly.
+              model_parameters:
+                temperature: 0.2
+                max_tokens: 2000
+                top_p: 0.8
+                frequency_penalty: 0.1
+
+          mcpServers:
+            sequential-thinking:
+              type: stdio
+              command: npx
+              args:
+                - -y
+                - "@modelcontextprotocol/server-sequential-thinking"
+            browser:
+              type: stdio
+              command: npx
+              args:
+                - -y
+                - "@agent-infra/mcp-server-browser@latest"
+            ddg-search:
+              type: stdio
+              command: uvx
+              args:
+                - duckduckgo-mcp-server
+            calculator:
+              type: stdio
+              command: uvx
+              args:
+                - mcp-server-calculator
 
         dest: /root/stacks/ai/librechat.yaml
 
@@ -86,20 +134,6 @@
           DEBUG_LOGGING=true
           DEBUG_CONSOLE=true
 
-          #=============#
-          # Permissions #
-          #=============#
-
-          # UID=1000
-          # GID=1000
-
-          #===============#
-          # Configuration #
-          #===============#
-          # Use an absolute path, a relative path, or a URL
-
-          # CONFIG_PATH="/alternative/path/to/librechat.yaml"
-
           #===================================================#
           #                     Endpoints                     #
           #===================================================#
@@ -111,15 +145,13 @@
           #============#
 
           OPENAI_API_KEY={{ api_keys.openai }}
-          OPENAI_MODELS=gpt-4.1-mini,gpt-4.1-nano,gpt-4.1,o4-mini
-
-          DEBUG_OPENAI=false
+          OPENAI_MODELS=gpt-5-mini,gpt-5,gpt-5-nano,gpt-4.1,o4-mini,
 
           # TITLE_CONVO=false
-          OPENAI_TITLE_MODEL=gpt-4.1-nano
+          OPENAI_TITLE_MODEL=gpt-5-nano
 
           OPENAI_SUMMARIZE=true
-          OPENAI_SUMMARY_MODEL=gpt-4.1-nano
+          OPENAI_SUMMARY_MODEL=gpt-5-nano
 
           CREDS_KEY={{ stacks.ai.env.CREDS_KEY }}
           CREDS_IV={{ stacks.ai.env.CREDS_IV }}
@@ -132,27 +164,6 @@
           MEILI_NO_ANALYTICS=true
           MEILI_HOST=http://0.0.0.0:7700
           MEILI_MASTER_KEY={{ stacks.ai.env.MEILI_MASTER_KEY }}
-
-          #==================================================#
-          #          Speech to Text & Text to Speech         #
-          #==================================================#
-
-          STT_API_KEY={{ api_keys.openai }}
-          TTS_API_KEY={{ api_keys.openai }}
-
-          #==================================================#
-          #                        RAG                       #
-          #==================================================#
-          # More info: https://www.librechat.ai/docs/configuration/rag_api
-
-          # RAG_OPENAI_BASEURL=
-          # RAG_OPENAI_API_KEY=
-          # EMBEDDINGS_PROVIDER=openai
-          # EMBEDDINGS_MODEL=text-embedding-3-small
-
-          #===================================================#
-          #                    User System                    #
-          #===================================================#
 
           #========================#
           # Moderation             #
@@ -209,7 +220,7 @@
           ALLOW_UNVERIFIED_EMAIL_LOGIN=true
 
           SESSION_EXPIRY=1000 * 60 * 15
-          REFRESH_TOKEN_EXPIRY=(1000 * 60 * 60 * 24) * 7
+          REFRESH_TOKEN_EXPIRY=(1000 * 60 * 60 * 24) * 14
 
           JWT_SECRET={{ stacks.ai.env.JWT_SECRET }}
           JWT_REFRESH_SECRET={{ stacks.ai.env.JWT_REFRESH_SECRET }}
@@ -221,12 +232,6 @@
           OPENID_SESSION_SECRET={{ stacks.ai.env.OPENID_SESSION_SECRET }}
           OPENID_CALLBACK_URL=/oauth/openid/callback
           OPENID_SCOPE="openid profile email"
-          # OPENID_REQUIRED_ROLE=user
-          # OPENID_REQUIRED_ROLE_TOKEN_KIND=
-          # OPENID_REQUIRED_ROLE_PARAMETER_PATH=
-
-          # OPENID_BUTTON_LABEL=Authentik
-          # OPENID_IMAGE_URL=
 
           #========================#
           # Email Password Reset   #
@@ -246,7 +251,7 @@
           #========================#
 
           ALLOW_SHARED_LINKS=true
-          ALLOW_SHARED_LINKS_PUBLIC=false
+          ALLOW_SHARED_LINKS_PUBLIC=true
 
           #==============================#
           # Static File Cache Control    #
@@ -265,10 +270,7 @@
           #===================================================#
 
           APP_TITLE=LibreChat
-          # CUSTOM_FOOTER="My custom footer"
           HELP_AND_FAQ_URL=https://librechat.ai
-
-          # SHOW_BIRTHDAY_ICON=true
 
           POSTGRES_DB=librechat_vector
           POSTGRES_USER=pgvector
