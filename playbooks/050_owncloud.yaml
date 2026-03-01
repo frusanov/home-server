@@ -1,0 +1,29 @@
+- name: Deploy OwnCloud stack
+  hosts: manager:!cloud
+  vars:
+    ansible_python_interpreter: /root/.ansible_venv/bin/python
+  tasks:
+    - name: Create owncloud_config volume
+      community.docker.docker_volume:
+        name: owncloud_config
+
+    - name: Create owncloud_data volume
+      community.docker.docker_volume:
+        name: owncloud_data
+
+    - name: Create OwnCloud stack directory
+      file:
+        path: /root/stacks/owncloud
+        state: directory
+
+    - name: Copy compose file to OwnCloud stack directory
+      copy:
+        src: ../stacks/owncloud/compose.yaml
+        dest: /root/stacks/owncloud/compose.yaml
+
+    - name: Deploy OwnCloud stack from a compose file
+      community.docker.docker_stack:
+        state: present
+        name: owncloud
+        compose:
+          - /root/stacks/owncloud/compose.yaml

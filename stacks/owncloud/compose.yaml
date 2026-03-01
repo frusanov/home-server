@@ -1,0 +1,51 @@
+services:
+  app:
+    image: owncloud/ocis:7
+    restart: unless-stopped
+    entrypoint:
+      - /bin/sh
+    command: ["-c", "ocis init || true; ocis server"]
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.services.owncloud.loadbalancer.server.port=9200"
+        - "traefik.http.routers.owncloud.rule=Host(`rusanov.cloud`)"
+        - "traefik.http.routers.owncloud.entrypoints=websecure"
+        - "traefik.http.routers.owncloud.tls.certresolver=default-acme"
+        - "traefik.docker.network=proxy"
+      placement:
+        constraints:
+          - node.role == manager
+    environment:
+      OCIS_INSECURE: "true"
+      PROXY_HTTP_ADDR: 0.0.0.0:9200
+      OCIS_URL: https://rusanov.cloud
+      OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-info}
+      OCIS_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
+      PROXY_TLS: "false" # do not use SSL between Traefik and oCIS
+      # OCIS_EXCLUDE_RUN_SERVICES: "idp"
+      # PROXY_ENABLE_BASIC_AUTH: "false"
+      # OCIS_OIDC_ISSUER: https://auth.rusanov.cloud/application/o/own-cloud-web/
+      # WEB_OIDC_CLIENT_ID: eBcWaO9Wf5w2QVGfn3F1eOEkgR29L76LnLNpZYx6
+      # PROXY_OIDC_REWRITE_WELLKNOWN: "true"
+      # PROXY_OIDC_ACCESS_TOKEN_VERIFY_METHOD: none
+      # PROXY_CSP_CONFIG_FILE_LOCATION: /etc/ocis/csp.yaml
+      # PROXY_AUTOPROVISION_ACCOUNTS: "true"
+      # PROXY_USER_OIDC_CLAIM: preferred_username  # or sub, depending on your OIDC claims
+      # PROXY_USER_CS3_CLAIM: username
+      # GRAPH_ASSIGN_DEFAULT_USER_ROLE: "true"
+    volumes:
+      - owncloud_config:/etc/ocis
+      - owncloud_data:/var/lib/ocis
+    networks:
+      - proxy
+
+volumes:
+  owncloud_config:
+    external: true
+  owncloud_data:
+    external: true
+
+networks:
+  proxy:
+    external: true

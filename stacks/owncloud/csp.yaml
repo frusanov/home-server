@@ -1,0 +1,38 @@
+directives:
+  child-src:
+    - "'self'"
+  connect-src:
+    - "'self'"
+    - "blob:"
+    - "https://raw.githubusercontent.com/owncloud/awesome-ocis/"
+    - "https://auth.rusanov.cloud/"
+  default-src:
+    - "'none'"
+  font-src:
+    - "'self'"
+    - "data:"              # ← Fix OIDC base64 fonts
+  frame-ancestors:
+    - "'none'"
+  frame-src:
+    - "'self'"
+    - "blob:"
+    - "https://embed.diagrams.net/"
+  img-src:
+    - "'self'"
+    - "data:"
+    - "blob:"
+    - "https://raw.githubusercontent.com/owncloud/awesome-ocis/"
+  manifest-src:
+    - "'self'"
+  media-src:
+    - "'self'"
+  object-src:
+    - "'self'"
+    - "blob:"
+  script-src:
+    - "'self'"
+    - "'unsafe-inline'"
+    - "'unsafe-eval'"      # ← Fix OIDC callback JS
+  style-src:
+    - "'self'"
+    - "'unsafe-inline'"
